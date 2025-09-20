@@ -1,34 +1,34 @@
 # =============================================================================
-# BCScan - Version PowerShell
-# Script PowerShell pour détecter les backdoors dans les addons GMod
+# BCScan - PowerShell Version
+# PowerShell script to detect backdoors in GMod addons
 # Compatible Windows 10/11, PowerShell 5.1+
 # =============================================================================
 
 param(
-    [Parameter(Mandatory=$true, HelpMessage="Chemin vers le dossier addons de GMod")]
+    [Parameter(Mandatory=$true, HelpMessage="Path to GMod addons folder")]
     [Alias("d")]
     [string]$Directory,
     
-    [Parameter(HelpMessage="Fichier de sortie du rapport (défaut: scan_results.txt)")]
+    [Parameter(HelpMessage="Output report file (default: scan_results.txt)")]
     [Alias("o")]
     [string]$OutputFile = "scan_results.txt",
     
-    [Parameter(HelpMessage="Afficher l'aide")]
+    [Parameter(HelpMessage="Show help")]
     [Alias("h")]
     [switch]$Help
 )
 
-# Configuration du script
+# Configuration
 $VERSION = "1.0.0"
 $SCRIPT_NAME = "BCScan"
 
-# Variables globales
+# Global variables
 $script:TotalFiles = 0
 $script:InfectedFiles = 0
 $script:TotalDetections = 0
 $script:ScanResults = @()
 
-# Fonction d'affichage du header
+# Function to display header
 function Write-Header {
     Write-Host "================================================" -ForegroundColor Blue
     Write-Host "        $SCRIPT_NAME v$VERSION" -ForegroundColor Blue
@@ -36,36 +36,36 @@ function Write-Header {
     Write-Host ""
 }
 
-# Fonction d'aide
+# Help function
 function Show-Help {
     Write-Header
     Write-Host "Usage:" -ForegroundColor Green
     Write-Host "  .\bcscan.ps1 -Directory <path> [-OutputFile <file>]"
     Write-Host ""
-    Write-Host "Paramètres:" -ForegroundColor Green
-    Write-Host "  -Directory, -d    Chemin vers le dossier addons de GMod (OBLIGATOIRE)"
-    Write-Host "  -OutputFile, -o   Fichier de sortie (défaut: scan_results.txt)"
-    Write-Host "  -Help, -h         Afficher cette aide"
+    Write-Host "Parameters:" -ForegroundColor Green
+    Write-Host "  -Directory, -d    Path to GMod addons folder (REQUIRED)"
+    Write-Host "  -OutputFile, -o   Output file (default: scan_results.txt)"
+    Write-Host "  -Help, -h         Show this help"
     Write-Host ""
-    Write-Host "Exemples:" -ForegroundColor Green
+    Write-Host "Examples:" -ForegroundColor Green
     Write-Host '  .\bcscan.ps1 -d "C:\SteamLibrary\steamapps\common\GarrysMod\garrysmod\addons"'
-    Write-Host '  .\bcscan.ps1 -Directory "D:\GMod\addons" -OutputFile "rapport_backdoors.txt"'
+    Write-Host '  .\bcscan.ps1 -Directory "D:\GMod\addons" -OutputFile "backdoor_report.txt"'
     Write-Host ""
 }
 
-# Patterns de détection (extraits du code PHP KVacDoor)
+# Detection patterns (extracted from KVacDoor PHP code)
 $BackdoorPatterns = @{
-    # Fonctions Lua dangereuses (niveau 1)
+    # Dangerous Lua functions (level 1)
     'RunString' = @{Name = 'RunString Function'; Level = 1}
     'RunStringEx' = @{Name = 'RunStringEx Function'; Level = 1}
     'CompileString' = @{Name = 'CompileString Function'; Level = 1}
     
-    # Fonctions HTTP (niveau 0)
+    # HTTP functions (level 0)
     'http\.Fetch' = @{Name = 'http.Fetch Function'; Level = 0}
     'http\.Post' = @{Name = 'http.Post Function'; Level = 0}
     'HTTP' = @{Name = 'HTTP Function'; Level = 0}
     
-    # Panels de backdoors spécifiques (niveau 3)
+    # Specific backdoor panels (level 3)
     'RunHASHOb' = @{Name = 'John Ducksent Obfuscator'; Level = 3}
     'kvac\.' = @{Name = 'KVacDoor Panel'; Level = 3}
     'kvacdoor\.' = @{Name = 'KVacDoor Panel'; Level = 3}
@@ -84,7 +84,7 @@ $BackdoorPatterns = @{
     '11,22,1,3' = @{Name = 'KVacDoor Panel Obfuscated'; Level = 3}
 }
 
-# Fonction pour obtenir l'émoji selon le niveau de dangerosité
+# Function to get emoji based on danger level
 function Get-DangerEmoji {
     param([int]$Level)
     
@@ -96,7 +96,7 @@ function Get-DangerEmoji {
     }
 }
 
-# Fonction pour obtenir la couleur selon le niveau
+# Function to get color based on level
 function Get-ColorByLevel {
     param([int]$Level)
     
@@ -108,21 +108,21 @@ function Get-ColorByLevel {
     }
 }
 
-# Fonction pour initialiser le fichier de rapport
+# Function to initialize report file
 function Initialize-Report {
     param([string]$FilePath, [string]$ScanDirectory)
     
     $reportContent = @"
 ================================================================================
-                          BCSCAN - RAPPORT DE SCAN
+                          BCSCAN - SCAN REPORT
 ================================================================================
-Date du scan: $(Get-Date -Format 'dd/MM/yyyy HH:mm:ss')
-Dossier scanné: $ScanDirectory
+Scan date: $(Get-Date -Format 'dd/MM/yyyy HH:mm:ss')
+Scanned folder: $ScanDirectory
 Script version: $VERSION
 OS: $($env:OS) - PowerShell $($PSVersionTable.PSVersion)
 
 ================================================================================
-                              RÉSULTATS DE SCAN
+                              SCAN RESULTS
 ================================================================================
 
 "@
@@ -159,11 +159,11 @@ function Scan-File {
         if ($detections.Count -gt 0) {
             $script:InfectedFiles++
             
-            # Affichage console
+            # Console display
             Write-Host "[INFECTED] $relativePath" -ForegroundColor Red
             
-            # Ajout au rapport
-            Add-Content -Path $OutputFile -Value "FICHIER INFECTÉ: $relativePath" -Encoding UTF8
+            # Add to report
+            Add-Content -Path $OutputFile -Value "INFECTED FILE: $relativePath" -Encoding UTF8
             Add-Content -Path $OutputFile -Value "----------------------------------------" -Encoding UTF8
             
             foreach ($detection in $detections) {
@@ -190,55 +190,55 @@ function Scan-File {
         }
     }
     catch {
-        Write-Host "[ERROR] Impossible de lire: $relativePath" -ForegroundColor Yellow
+        Write-Host "[ERROR] Cannot read: $relativePath" -ForegroundColor Yellow
         return $false
     }
 }
 
-# Fonction pour scanner récursivement un dossier
+# Function to recursively scan a directory
 function Scan-Directory {
     param([string]$DirectoryPath)
     
-    Write-Host "Démarrage du scan de: $DirectoryPath" -ForegroundColor Blue
+    Write-Host "Starting scan of: $DirectoryPath" -ForegroundColor Blue
     Write-Host ""
     
-    # Compter le nombre total de fichiers .lua
+    # Count total number of .lua files
     try {
         $luaFiles = Get-ChildItem -Path $DirectoryPath -Filter "*.lua" -Recurse -File -ErrorAction Stop
         $script:TotalFiles = $luaFiles.Count
     }
     catch {
-        Write-Host "Erreur lors de l'accès au dossier: $_" -ForegroundColor Red
+        Write-Host "Error accessing folder: $_" -ForegroundColor Red
         exit 1
     }
     
     if ($script:TotalFiles -eq 0) {
-        Write-Host "Aucun fichier .lua trouvé dans le dossier spécifié." -ForegroundColor Yellow
+        Write-Host "No .lua files found in specified folder." -ForegroundColor Yellow
         exit 1
     }
     
-    Write-Host "Nombre total de fichiers .lua à scanner: $($script:TotalFiles)" -ForegroundColor Blue
+    Write-Host "Total .lua files to scan: $($script:TotalFiles)" -ForegroundColor Blue
     Write-Host ""
     
-    # Initialisation du rapport
+    # Initialize report
     Initialize-Report -FilePath $OutputFile -ScanDirectory $DirectoryPath
     
     $currentFile = 0
     
-    # Scanner tous les fichiers .lua
+    # Scan all .lua files
     foreach ($file in $luaFiles) {
         $currentFile++
         $percentage = [math]::Round(($currentFile / $script:TotalFiles) * 100, 1)
         
-        Write-Progress -Activity "Scan en cours..." -Status "Fichier $currentFile/$($script:TotalFiles) ($percentage%)" -PercentComplete $percentage
+        Write-Progress -Activity "Scanning..." -Status "File $currentFile/$($script:TotalFiles) ($percentage%)" -PercentComplete $percentage
         
         Scan-File -FilePath $file.FullName -BasePath $DirectoryPath
     }
     
-    Write-Progress -Activity "Scan en cours..." -Completed
+    Write-Progress -Activity "Scanning..." -Completed
 }
 
-# Fonction pour générer le résumé final
+# Function to generate final summary
 function Generate-Summary {
     $cleanFiles = $script:TotalFiles - $script:InfectedFiles
     $infectionRate = if ($script:TotalFiles -gt 0) { 
@@ -247,50 +247,50 @@ function Generate-Summary {
         0 
     }
     
-    # Ajout du résumé au rapport
+    # Add summary to report
     $summaryContent = @"
 
 ================================================================================
-                               RÉSUMÉ DU SCAN
+                               SCAN SUMMARY
 ================================================================================
-Fichiers analysés: $($script:TotalFiles)
-Fichiers infectés: $($script:InfectedFiles)
-Fichiers propres: $cleanFiles
-Total détections: $($script:TotalDetections)
+Files analyzed: $($script:TotalFiles)
+Infected files: $($script:InfectedFiles)
+Clean files: $cleanFiles
+Total detections: $($script:TotalDetections)
 
-Taux d'infection: $infectionRate%
+Infection rate: $infectionRate%
 
 ================================================================================
-                          FIN DU RAPPORT DE SCAN
+                          END OF SCAN REPORT
 ================================================================================
 "@
     
     Add-Content -Path $OutputFile -Value $summaryContent -Encoding UTF8
     
-    # Affichage du résumé en console
+    # Display summary in console
     Write-Host ""
     Write-Host "================================================" -ForegroundColor Blue
-    Write-Host "              RÉSUMÉ DU SCAN" -ForegroundColor Blue
+    Write-Host "              SCAN SUMMARY" -ForegroundColor Blue
     Write-Host "================================================" -ForegroundColor Blue
-    Write-Host "Fichiers analysés: $($script:TotalFiles)" -ForegroundColor Green
-    Write-Host "Fichiers infectés: $($script:InfectedFiles)" -ForegroundColor Red
-    Write-Host "Fichiers propres: $cleanFiles" -ForegroundColor Green
-    Write-Host "Total détections: $($script:TotalDetections)" -ForegroundColor Yellow
+    Write-Host "Files analyzed: $($script:TotalFiles)" -ForegroundColor Green
+    Write-Host "Infected files: $($script:InfectedFiles)" -ForegroundColor Red
+    Write-Host "Clean files: $cleanFiles" -ForegroundColor Green
+    Write-Host "Total detections: $($script:TotalDetections)" -ForegroundColor Yellow
     Write-Host ""
     
     if ($script:InfectedFiles -gt 0) {
-        Write-Host "WARNING: Des backdoors ont été détectées!" -ForegroundColor Red
-        Write-Host "Consultez le rapport complet: $OutputFile" -ForegroundColor Yellow
+        Write-Host "WARNING: Backdoors have been detected!" -ForegroundColor Red
+        Write-Host "Check the full report: $OutputFile" -ForegroundColor Yellow
     } else {
-        Write-Host "SUCCESS: Aucune backdoor détectée! Vos addons semblent propres." -ForegroundColor Green
+        Write-Host "SUCCESS: No backdoors detected! Your addons appear to be clean." -ForegroundColor Green
     }
     
     Write-Host ""
 }
 
-# Fonction principale
+# Main function
 function Main {
-    # Vérification de l'aide
+    # Check for help
     if ($Help) {
         Show-Help
         return
@@ -298,29 +298,29 @@ function Main {
     
     Write-Header
     
-    # Vérification des prérequis
+    # Check prerequisites
     if (-not $Directory) {
-        Write-Host "Erreur: Vous devez spécifier un dossier à scanner avec -Directory" -ForegroundColor Red
+        Write-Host "Error: You must specify a folder to scan with -Directory" -ForegroundColor Red
         Write-Host ""
         Show-Help
         return
     }
     
     if (-not (Test-Path -Path $Directory)) {
-        Write-Host "Erreur: Le dossier '$Directory' n'existe pas." -ForegroundColor Red
+        Write-Host "Error: Folder '$Directory' does not exist." -ForegroundColor Red
         return
     }
     
-    # Vérification de PowerShell version
+    # Check PowerShell version
     if ($PSVersionTable.PSVersion.Major -lt 5) {
-        Write-Host "Attention: Ce script nécessite PowerShell 5.0 ou supérieur" -ForegroundColor Yellow
+        Write-Host "Warning: This script requires PowerShell 5.0 or higher" -ForegroundColor Yellow
     }
     
-    # Démarrage du scan
+    # Start scan
     Write-Host "Configuration:" -ForegroundColor Green
-    Write-Host "  Dossier à scanner: " -NoNewline -ForegroundColor White
+    Write-Host "  Folder to scan: " -NoNewline -ForegroundColor White
     Write-Host $Directory -ForegroundColor Yellow
-    Write-Host "  Fichier de rapport: " -NoNewline -ForegroundColor White
+    Write-Host "  Report file: " -NoNewline -ForegroundColor White
     Write-Host $OutputFile -ForegroundColor Yellow
     Write-Host ""
     
@@ -333,14 +333,14 @@ function Main {
         $endTime = Get-Date
         $duration = $endTime - $startTime
         
-        Write-Host "Scan terminé avec succès!" -ForegroundColor Blue
-        Write-Host "Durée du scan: $($duration.ToString('mm\:ss'))" -ForegroundColor Cyan
-        Write-Host "Rapport sauvegardé: $OutputFile" -ForegroundColor Green
+        Write-Host "Scan completed successfully!" -ForegroundColor Blue
+        Write-Host "Scan duration: $($duration.ToString('mm\:ss'))" -ForegroundColor Cyan
+        Write-Host "Report saved: $OutputFile" -ForegroundColor Green
     }
     catch {
-        Write-Host "Erreur lors du scan: $_" -ForegroundColor Red
+        Write-Host "Error during scan: $_" -ForegroundColor Red
     }
 }
 
-# Exécution du script principal
+# Execute main script
 Main

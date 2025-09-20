@@ -1,12 +1,10 @@
 @echo off
-chcp 65001 >n# Vérification que le script PowerShell existe
-if not exist "gmod_backdoor_scanner.ps1" (
-    echo [ERREUR] Le fichier bcscan.ps1 est introuvable
-    echo Assurez-vous qu'il soit dans le même dossier que ce fichier batchtitle BCScan
+chcp 65001 >nul
+title BCScan
 
 :: =============================================================================
-:: Lanceur Batch pour BCScan
-:: Simplifie l'utilisation du script PowerShell
+:: Batch Launcher for BCScan
+:: Simplifies PowerShell script usage
 :: =============================================================================
 
 echo.
@@ -15,44 +13,44 @@ echo                 BCScan
 echo ================================================
 echo.
 
-:: Vérification de PowerShell
+:: PowerShell verification
 powershell -Command "Get-Host" >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [ERREUR] PowerShell n'est pas disponible sur ce système
-    echo Veuillez installer PowerShell 5.0 ou supérieur
+    echo [ERROR] PowerShell is not available on this system
+    echo Please install PowerShell 5.0 or higher
     pause
     exit /b 1
 )
 
-:: Vérification que le script PowerShell existe
+:: Check if PowerShell script exists
 if not exist "gmod_backdoor_scanner.ps1" (
-    echo [ERREUR] Le fichier gmod_backdoor_scanner.ps1 est introuvable
-    echo Assurez-vous qu'il soit dans le même dossier que ce fichier batch
+    echo [ERROR] File gmod_backdoor_scanner.ps1 not found
+    echo Make sure it's in the same folder as this batch file
     pause
     exit /b 1
 )
 
-:: Interface utilisateur simple
-echo Veuillez sélectionner votre dossier addons GMod:
+:: Simple user interface
+echo Please select your GMod addons folder:
 echo.
-echo Exemples de chemins typiques:
+echo Typical path examples:
 echo - C:\SteamLibrary\steamapps\common\GarrysMod\garrysmod\addons
 echo - C:\Program Files (x86)\Steam\steamapps\common\GarrysMod\garrysmod\addons
 echo - D:\Games\Steam\steamapps\common\GarrysMod\garrysmod\addons
 echo.
 
-set /p addon_path="Chemin vers le dossier addons: "
+set /p addon_path="Path to addons folder: "
 
-:: Vérification que le chemin existe
+:: Check if path exists
 if not exist "%addon_path%" (
     echo.
-    echo [ERREUR] Le dossier "%addon_path%" n'existe pas
-    echo Vérifiez le chemin et réessayez
+    echo [ERROR] Folder "%addon_path%" does not exist
+    echo Check the path and try again
     pause
     exit /b 1
 )
 
-:: Nom du fichier de rapport avec timestamp
+:: Report filename with timestamp
 for /f "tokens=2-4 delims=/ " %%a in ('date /t') do (set mydate=%%c-%%a-%%b)
 for /f "tokens=1-2 delims=/:" %%a in ("%TIME%") do (set mytime=%%a%%b)
 set mytime=%mytime: =0%
@@ -60,35 +58,35 @@ set report_file=scan_report_%mydate%_%mytime%.txt
 
 echo.
 echo Configuration:
-echo   Dossier à scanner: %addon_path%
-echo   Fichier de rapport: %report_file%
+echo   Folder to scan: %addon_path%
+echo   Report file: %report_file%
 echo.
-echo Démarrage du scan...
+echo Starting scan...
 echo.
 
-:: Exécution du script PowerShell
+:: Execute PowerShell script
 powershell -ExecutionPolicy Bypass -File "gmod_backdoor_scanner.ps1" -Directory "%addon_path%" -OutputFile "%report_file%"
 
 if %errorlevel% equ 0 (
     echo.
     echo ================================================
-    echo            SCAN TERMINÉ AVEC SUCCÈS
+    echo            SCAN COMPLETED SUCCESSFULLY
     echo ================================================
     echo.
-    echo Le rapport a été sauvegardé dans: %report_file%
+    echo Report saved to: %report_file%
     echo.
     
-    :: Demander si l'utilisateur veut ouvrir le rapport
-    choice /c ON /m "Voulez-vous Ouvrir le rapport ou passer à la suite (N)"
+    :: Ask if user wants to open the report
+    choice /c ON /m "Do you want to Open the report or continue to Next (N)"
     if !errorlevel!==1 (
         start notepad "%report_file%"
     )
 ) else (
     echo.
-    echo [ERREUR] Le scan a échoué
-    echo Vérifiez les messages d'erreur ci-dessus
+    echo [ERROR] Scan failed
+    echo Check error messages above
 )
 
 echo.
-echo Appuyez sur une touche pour fermer...
+echo Press any key to close...
 pause >nul

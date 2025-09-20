@@ -1,60 +1,60 @@
-# BCScan - Guide Windows
+# BCScan - Windows Guide
 
-## 🚀 Installation et Utilisation sur Windows
+## 🚀 Installation and Usage on Windows
 
-### Méthode 1: Utilisation simple avec le fichier .bat (RECOMMANDÉ)
+### Method 1: Simple usage with .bat file (RECOMMENDED)
 
-1. **Double-cliquez** sur `run_scanner.bat`
-2. **Entrez le chemin** vers votre dossier addons GMod
-3. **Attendez** que le scan se termine
-4. **Consultez** le rapport généré automatiquement
+1. **Double-click** on `run_scanner_en.bat`
+2. **Enter the path** to your GMod addons folder
+3. **Wait** for the scan to complete
+4. **Check** the automatically generated report
 
-**Exemples de chemins typiques :**
+**Typical path examples:**
 ```
 C:\SteamLibrary\steamapps\common\GarrysMod\garrysmod\addons
 C:\Program Files (x86)\Steam\steamapps\common\GarrysMod\garrysmod\addons
 D:\Games\Steam\steamapps\common\GarrysMod\garrysmod\addons
 ```
 
-### Méthode 2: Utilisation PowerShell directe
+### Method 2: Direct PowerShell usage
 
-1. **Ouvrez PowerShell** (clic droit sur le menu Démarrer → Windows PowerShell)
-2. **Naviguez** vers le dossier contenant le script :
+1. **Open PowerShell** (right-click Start menu → Windows PowerShell)
+2. **Navigate** to the folder containing the script:
    ```powershell
    cd "C:\Users\eliott\Downloads\kvacdoor-main"
    ```
-3. **Exécutez** le scanner :
+3. **Execute** the scanner:
    ```powershell
-   .\gmod_backdoor_scanner.ps1 -Directory "C:\chemin\vers\addons"
+   .\gmod_backdoor_scanner.ps1 -Directory "C:\path\to\addons"
    ```
 
-### Méthode 3: Avec paramètres avancés
+### Method 3: With advanced parameters
 
 ```powershell
-# Scan avec rapport personnalisé
-.\gmod_backdoor_scanner.ps1 -d "C:\GMod\addons" -o "mon_rapport.txt"
+# Scan with custom report
+.\gmod_backdoor_scanner.ps1 -d "C:\GMod\addons" -o "my_report.txt"
 
-# Afficher l'aide
+# Show help
 .\gmod_backdoor_scanner.ps1 -Help
 ```
 
-## 🔧 Dépannage Windows
+## 🔧 Windows Troubleshooting
 
-### Erreur "Execution Policy"
-Si vous obtenez une erreur de politique d'exécution :
+### "Execution Policy" Error
+If you get an execution policy error:
 
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
 
-### Chemin avec espaces
-Utilisez des guillemets pour les chemins contenant des espaces :
+### Paths with spaces
+Use quotes for paths containing spaces:
 ```powershell
 .\gmod_backdoor_scanner.ps1 -Directory "C:\Program Files (x86)\Steam\steamapps\common\GarrysMod\garrysmod\addons"
 ```
 
-## 📊 Exemple de sortie Windows
+## 📊 Windows Output Example
 
 ```
 ================================================
@@ -62,58 +62,58 @@ Utilisez des guillemets pour les chemins contenant des espaces :
 ================================================
 
 Configuration:
-  Dossier à scanner: C:\SteamLibrary\steamapps\common\GarrysMod\garrysmod\addons
-  Fichier de rapport: scan_results.txt
+  Folder to scan: C:\SteamLibrary\steamapps\common\GarrysMod\garrysmod\addons
+  Report file: scan_results.txt
 
-Démarrage du scan de: C:\SteamLibrary\steamapps\common\GarrysMod\garrysmod\addons
-Nombre total de fichiers .lua à scanner: 1247
+Starting scan of: C:\SteamLibrary\steamapps\common\GarrysMod\garrysmod\addons
+Total .lua files to scan: 1247
 
 [INFECTED] addon_suspect\lua\autorun\server\init.lua
-  ⛔ KVacDoor Panel (Niveau: 3)
-  🟡 http.Fetch Function (Niveau: 0)
+  [CRITICAL] KVacDoor Panel (Level: 3)
+  [SUSPECT] http.Fetch Function (Level: 0)
 
-[CLEAN] addon_propre\lua\init.lua
-[INFECTED] autre_addon\lua\backdoor.lua
-  ⛔ Omega Panel (Niveau: 3)
+[CLEAN] addon_clean\lua\init.lua
+[INFECTED] other_addon\lua\backdoor.lua
+  [CRITICAL] Omega Panel (Level: 3)
 
 ================================================
-              RÉSUMÉ DU SCAN
+              SCAN SUMMARY
 ================================================
-Fichiers analysés: 1247
-Fichiers infectés: 2
-Fichiers propres: 1245
-Total détections: 3
+Files analyzed: 1247
+Infected files: 2
+Clean files: 1245
+Total detections: 3
 
-⚠️  ATTENTION: Des backdoors ont été détectées!
-Consultez le rapport complet: scan_results.txt
+WARNING: Backdoors have been detected!
+Check the full report: scan_results.txt
 
-Scan terminé avec succès!
-Durée du scan: 02:34
-Rapport sauvegardé: scan_results.txt
+Scan completed successfully!
+Scan duration: 02:34
+Report saved: scan_results.txt
 ```
 
 
 
-## ⚡ Avantages de la version Windows
+## ⚡ Windows Version Advantages
 
-✅ **Interface graphique** - Barre de progression Windows  
-✅ **Intégration native** - Fonctionne avec PowerShell pré-installé  
-✅ **Double-clic facile** - Utilisation via fichier .bat  
-✅ **Rapports horodatés** - Noms de fichiers automatiques  
-✅ **Gestion des espaces** - Chemins Windows avec espaces supportés  
-✅ **Encodage UTF-8** - Support des caractères spéciaux  
+✅ **Graphical interface** - Windows progress bar  
+✅ **Native integration** - Works with pre-installed PowerShell  
+✅ **Easy double-click** - Usage via .bat file  
+✅ **Timestamped reports** - Automatic filename generation  
+✅ **Space handling** - Windows paths with spaces supported  
+✅ **UTF-8 encoding** - Special character support  
 
-## 🛡️ Sécurité
+## 🛡️ Security
 
-Le script :
-- **Ne modifie aucun fichier** - Lecture seule
-- **Reste local** - Aucune connexion internet
-- **Open source** - Code lisible et modifiable
-- **Pas de données envoyées** - Tout reste sur votre PC
+The script:
+- **Does not modify any files** - Read-only
+- **Stays local** - No internet connection
+- **Open source** - Readable and modifiable code
+- **No data sent** - Everything stays on your PC
 
 ## 📞 Support
 
-En cas de problème :
-1. Vérifiez que PowerShell est installé (Windows 10/11 l'ont par défaut)
-2. Utilisez le fichier .bat pour une utilisation simplifiée  
-3. Vérifiez les chemins (utilisez des guillemets pour les espaces)
+In case of problems:
+1. Check that PowerShell is installed (Windows 10/11 have it by default)
+2. Use the .bat file for simplified usage  
+3. Check paths (use quotes for spaces)
